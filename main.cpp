@@ -31,27 +31,45 @@ static void PrintMessage(
 	MessageType type,
 	const string& message,
 	int indentCount = 0);
-static bool CopyVK();
 static bool ParseExtensions();
 static bool ParseLayers();
 
+static path parser_in{};
+static path parser_out{};
+static path result_log_path{};
+static ofstream result_log{};
+
 int main ()
 {
-	PrintMessage(
-		MessageType::TYPE_MESSAGE, 
-		"Starting to copy VK file...");
-	
-	if (CopyVK())
-	{
-		PrintMessage(
-			MessageType::TYPE_SUCCESS,
-			"Copied VK!");
-	}
-	else 
+	parser_in = path(current_path().parent_path().parent_path().parent_path() / "parser_in");
+	if (!exists(parser_in))
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to copy VK file!");
+			"Failed to find parser_in folder from '" + parser_in.string() + "'!");
+		
+		cin.get();
+		return 0;
+	}
+	
+	parser_out = path(current_path().parent_path().parent_path().parent_path() / "parser_out");
+	if (!exists(parser_out))
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to find parser_out folder from '" + parser_out.string() + "'!");
+			
+		cin.get();
+		return 0;
+	}
+	
+	result_log_path = path(parser_out / "result_log.txt");
+	result_log.open(result_log_path);
+	if (!result_log.is_open())
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to open '" + result_log_path.string() + "' for writing!");
 		
 		cin.get();
 		return 0;
@@ -73,6 +91,7 @@ int main ()
 			MessageType::TYPE_ERROR, 
 			"Failed to parse extensions!");
 			
+		result_log.close();
 		cin.get();
 		return 0;
 	}
@@ -93,10 +112,12 @@ int main ()
 			MessageType::TYPE_ERROR, 
 			"Failed to parse layers!");
 			
+		result_log.close();
 		cin.get();
 		return 0;
 	}
 	
+	result_log.close();
 	cin.get();
 	return 0;
 }
@@ -132,47 +153,15 @@ void PrintMessage(
 		indentStr += " ";
 	}
 	
-	cout << indentStr << typeStr << message << "\n";
-}
-
-bool CopyVK()
-{
-	path source = path(current_path().parent_path().parent_path().parent_path() / "vk.xml");
-	if (!exists(source))
-	{
-		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to find source file '" + source.string() + "'!");
-		return false;
-	}
+	string fullMessage = indentStr + typeStr + message + "\n";
 	
-	path destination = path(current_path() / "vk.xml");
-	
-	try
-	{
-		copy_file
-		(
-			source,
-			destination,
-			copy_options::overwrite_existing
-		);	
-	}
-	catch (const exception& e)
-	{
-		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to copy file '" + source.string() + 
-			"' to  '" + destination.string() +
-			"' because '" + e.what() + "'!");
-		return false;
-	}
-	
-	return true;
+	cout << fullMessage;
+	result_log << fullMessage;
 }
 
 bool ParseExtensions()
 {
-	path filePath = path(current_path() / "vk.xml");
+	path filePath = path(parser_in / "vk.xml");
 	if (!exists(filePath))
 	{
 		PrintMessage(
@@ -308,14 +297,14 @@ bool ParseExtensions()
 	//
 	
 	//write output
-	path deviceOutputPath = path(current_path() / "vulkan_device_extensions.txt");
+	path deviceOutputPath = path(parser_out / "vulkan_device_extensions.txt");
 	
 	ofstream deviceOut(deviceOutputPath);
 	if (!deviceOut.is_open())
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + deviceOutputPath.string() + "' for editing!");
+			"Failed to open file '" + deviceOutputPath.string() + "' for writing!");
 		return false;
 	}
 	
@@ -335,14 +324,14 @@ bool ParseExtensions()
 	//
 	
 	//write output
-	path instanceOutputPath = path(current_path() / "vulkan_instance_extensions.txt");
+	path instanceOutputPath = path(parser_out / "vulkan_instance_extensions.txt");
 	
 	ofstream instanceOut(instanceOutputPath);
 	if (!instanceOut.is_open())
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + instanceOutputPath.string() + "' for editing!");
+			"Failed to open file '" + instanceOutputPath.string() + "' for writing!");
 		return false;
 	}
 	
@@ -362,7 +351,7 @@ bool ParseExtensions()
 
 bool ParseLayers()
 {
-	path filePath = path(current_path() / "vk.xml");
+	path filePath = path(parser_in / "vk.xml");
 	if (!exists(filePath))
 	{
 		PrintMessage(
@@ -438,14 +427,14 @@ bool ParseLayers()
 	}
 	
 	//write output
-	path instanceLayerOutputPath = path(current_path() / "vulkan_instance_layers.txt");
+	path instanceLayerOutputPath = path(parser_out / "vulkan_instance_layers.txt");
 	
 	ofstream instanceLayerOut(instanceLayerOutputPath);
 	if (!instanceLayerOut.is_open())
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + instanceLayerOutputPath.string() + "' for editing!");
+			"Failed to open file '" + instanceLayerOutputPath.string() + "' for writing!");
 		return false;
 	}
 	
