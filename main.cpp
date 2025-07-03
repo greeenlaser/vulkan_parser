@@ -223,6 +223,7 @@ bool ParseExtensions()
 
 		//skip vendor- and OS-specific junk (non-Windows, non-X11)
 		if (name.starts_with("VK_AMD_")
+			|| name.starts_with("VK_AMDX_")
 			|| name.starts_with("VK_NV_")
 			|| name.starts_with("VK_NVX_")
 			|| name.starts_with("VK_INTEL_")

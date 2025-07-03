@@ -33,7 +33,6 @@ VK_KHR_variable_pointers
 VK_KHR_dedicated_allocation
 VK_EXT_sampler_filter_minmax
 VK_KHR_storage_buffer_storage_class
-VK_AMDX_shader_enqueue
 VK_EXT_inline_uniform_block
 VK_KHR_shader_bfloat16
 VK_KHR_relaxed_block_layout

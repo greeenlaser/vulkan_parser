@@ -46,7 +46,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_KHR_dedicated_allocation'!
   [SUCCESS] Found 'device' extension 'VK_EXT_sampler_filter_minmax'!
   [SUCCESS] Found 'device' extension 'VK_KHR_storage_buffer_storage_class'!
-  [SUCCESS] Found 'device' extension 'VK_AMDX_shader_enqueue'!
   [SUCCESS] Found 'device' extension 'VK_EXT_inline_uniform_block'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_bfloat16'!
   [SUCCESS] Found 'device' extension 'VK_KHR_relaxed_block_layout'!
