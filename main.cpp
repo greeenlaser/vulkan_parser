@@ -253,7 +253,6 @@ bool ParseExtensions()
 			|| name.starts_with("VK_MTK_")
 			|| name.starts_with("VK_FB_")
 			|| name.starts_with("VK_COREAVI_")
-			|| name.starts_with("VK_MSFT_")
 			|| name.starts_with("VK_OHOS_")
 			|| name.find("wayland") != string::npos
 			|| name.find("directfb") != string::npos
