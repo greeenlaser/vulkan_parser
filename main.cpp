@@ -12,6 +12,7 @@ using std::filesystem::path;
 using std::filesystem::exists;
 using std::filesystem::copy_file;
 using std::filesystem::copy_options;
+using std::filesystem::directory_iterator;
 using std::string;
 using std::to_string;
 using std::ifstream;
@@ -351,71 +352,71 @@ bool ParseExtensions()
 
 bool ParseLayers()
 {
-	path filePath = path(parser_in / "vk.xml");
-	if (!exists(filePath))
-	{
-		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to find file '" + filePath.string() + "'!");
-		return false;
-	}
-	
-	ifstream file(filePath);
-	if (!file.is_open())
-	{
-		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + filePath.string() + "' for reading!");
-		return false;
-	}
-	
 	vector<string> instanceLayers{};
-	string line{};
 	
-	while (getline(file, line))
+	for (const auto& file : parser_out)
 	{
-		if (line.find("<layer") == string::npos) continue;
+		path filePath = path(file);
 		
-		//extract attributes
-		auto ExtractAttribute = [](const string& line, const string& key) -> string
+		string extension = filePath.extension().string();
+		if (extension != ".json") continue;
+		
+		ifstream file(filePath);
+		if (!file.is_open())
 		{
-			string pattern = key + "=\"";
-			size_t start = line.find(pattern);
-			if (start == string::npos) return "";
-			
-			start += pattern.length();
-			size_t end = line.find('"', start);
-			if (end == string::npos) return "";
-			
-			return line.substr(start, end - start);
-		};
-		
-		const string name = ExtractAttribute(line, "name");
-		if (name.empty()) continue;
-		
-		if (name != "VK_LAYER_KHRONOS_validation" &&
-			!name.starts_with("VK_LAYER_LUNARG_"))
-		{
-			if (name.starts_with("VK_LAYER_RENDERDOC_")
-				|| name.starts_with("VK_LAYER_NV_")
-				|| name.starts_with("VK_LAYER_MESA_")
-				|| name.starts_with("VK_LAYER_INTEL_")
-				|| name.starts_with("VK_LAYER_GOOGLE_")
-				|| name.starts_with("VK_LAYER_OBSOLETE_"))
-			{
-				continue;
-			}
+			PrintMessage(
+				MessageType::TYPE_ERROR, 
+				"Failed to open file '" + filePath.string() + "' for reading!");
+			return false;
 		}
 		
-		instanceLayers.push_back(name);
+		string line{};
 		
-		PrintMessage(
-			MessageType::TYPE_SUCCESS, 
-			"Found instance layer '" + name + "'!",
-			2);
+		while (getline(file, line))
+		{
+			if (line.find("<layer") == string::npos) continue;
+			
+			//extract attributes
+			auto ExtractAttribute = [](const string& line, const string& key) -> string
+			{
+				string pattern = key + "=\"";
+				size_t start = line.find(pattern);
+				if (start == string::npos) return "";
+				
+				start += pattern.length();
+				size_t end = line.find('"', start);
+				if (end == string::npos) return "";
+				
+				return line.substr(start, end - start);
+			};
+			
+			const string name = ExtractAttribute(line, "name");
+			if (name.empty()) continue;
+			
+			if (name != "VK_LAYER_KHRONOS_validation" &&
+				!name.starts_with("VK_LAYER_LUNARG_"))
+			{
+				if (name.starts_with("VK_LAYER_RENDERDOC_")
+					|| name.starts_with("VK_LAYER_NV_")
+					|| name.starts_with("VK_LAYER_MESA_")
+					|| name.starts_with("VK_LAYER_INTEL_")
+					|| name.starts_with("VK_LAYER_GOOGLE_")
+					|| name.starts_with("VK_LAYER_OBSOLETE_"))
+				{
+					continue;
+				}
+			}
+			
+			instanceLayers.push_back(name);
+			
+			PrintMessage(
+				MessageType::TYPE_SUCCESS, 
+				"Found instance layer '" + name + "'!",
+				2);
+		}
+		
+		file.close();
 	}
-	
-	file.close();
 	
 	size_t instanceLayersSize = instanceLayers.size();
 	if (instanceLayersSize == 0)
@@ -425,10 +426,10 @@ bool ParseLayers()
 			"Failed to find any vulkan 1.2 instance layers from file '" + filePath.string() + "'!");
 		return false;
 	}
-	
+		
 	//write output
 	path instanceLayerOutputPath = path(parser_out / "vulkan_instance_layers.txt");
-	
+		
 	ofstream instanceLayerOut(instanceLayerOutputPath);
 	if (!instanceLayerOut.is_open())
 	{
@@ -437,17 +438,17 @@ bool ParseLayers()
 			"Failed to open file '" + instanceLayerOutputPath.string() + "' for writing!");
 		return false;
 	}
-	
+		
 	for (const auto& ext : instanceLayers)
 	{
 		instanceLayerOut << ext << "\n";
 	}
 	instanceLayerOut.close();
-	
+		
 	PrintMessage(
 		MessageType::TYPE_SUCCESS, 
 		"Found and saved '" + to_string(instanceLayersSize) + 
 		"' instance layers to '" + instanceLayerOutputPath.string() + "'!");
-
+	
 	return true;
 }
