@@ -208,9 +208,8 @@ bool ParseExtensions()
 		const string type = ExtractAttribute(line, "type");
 		
 		//skip extensions promoted to Vulkan core
-		if (promoted == "vulkan12"
-			|| promoted == "vulkan13"
-			|| promoted == "vulkan14")
+		if (promoted == "VK_VERSION_1_1"
+			|| promoted == "VK_VERSION_1_2")
 		{
 			continue;
 		}
