@@ -8,8 +8,6 @@ VK_EXT_debug_marker
 VK_KHR_video_queue
 VK_KHR_video_decode_queue
 VK_EXT_transform_feedback
-VK_NVX_binary_import
-VK_NVX_image_view_handle
 VK_KHR_video_encode_h264
 VK_KHR_video_encode_h265
 VK_KHR_video_decode_h264
@@ -37,7 +35,6 @@ VK_KHR_shader_float16_int8
 VK_KHR_16bit_storage
 VK_KHR_descriptor_update_template
 VK_EXT_acquire_xlib_display
-VK_NVX_multiview_per_view_attributes
 VK_KHR_imageless_framebuffer
 VK_KHR_create_renderpass2
 VK_KHR_external_fence_capabilities

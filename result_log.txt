@@ -11,8 +11,6 @@ Starting to parse VK file...
   [SUCCESS] Found result 'VK_KHR_video_queue'!
   [SUCCESS] Found result 'VK_KHR_video_decode_queue'!
   [SUCCESS] Found result 'VK_EXT_transform_feedback'!
-  [SUCCESS] Found result 'VK_NVX_binary_import'!
-  [SUCCESS] Found result 'VK_NVX_image_view_handle'!
   [SUCCESS] Found result 'VK_KHR_video_encode_h264'!
   [SUCCESS] Found result 'VK_KHR_video_encode_h265'!
   [SUCCESS] Found result 'VK_KHR_video_decode_h264'!
@@ -40,7 +38,6 @@ Starting to parse VK file...
   [SUCCESS] Found result 'VK_KHR_16bit_storage'!
   [SUCCESS] Found result 'VK_KHR_descriptor_update_template'!
   [SUCCESS] Found result 'VK_EXT_acquire_xlib_display'!
-  [SUCCESS] Found result 'VK_NVX_multiview_per_view_attributes'!
   [SUCCESS] Found result 'VK_KHR_imageless_framebuffer'!
   [SUCCESS] Found result 'VK_KHR_create_renderpass2'!
   [SUCCESS] Found result 'VK_KHR_external_fence_capabilities'!
@@ -199,5 +196,5 @@ Starting to parse VK file...
   [SUCCESS] Found result 'VK_KHR_robustness2'!
   [SUCCESS] Found result 'VK_EXT_fragment_density_map_offset'!
   [SUCCESS] Found result 'VK_EXT_zero_initialize_device_memory'!
-[SUCCESS] Found and saved '198' opt-in extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\out\build\debug\vulkan_1_2_opt_in.txt'!
+[SUCCESS] Found and saved '195' opt-in extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\out\build\debug\vulkan_1_2_opt_in.txt'!
 [SUCCESS] Parsed VK file!
