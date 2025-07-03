@@ -188,12 +188,6 @@ bool ParseVK()
 			if (end == string::npos) return "";
 			
 			string result = line.substr(start, end - start);
-			
-			PrintMessage(
-				MessageType::TYPE_SUCCESS, 
-				"Found result '" + result + "'!",
-				2);
-
 			return result;
 		};
 		
@@ -201,14 +195,57 @@ bool ParseVK()
 		const string supported = ExtractAttribute(line, "supported");
 		const string promoted = ExtractAttribute(line, "promotedto");
 		
-		if (supported != "vulkan") continue;
-		if (promoted == "vulkan13"
+		// skip extensions promoted to Vulkan core
+		if (promoted == "vulkan12"
+			|| promoted == "vulkan13"
 			|| promoted == "vulkan14")
 		{
-			continue;	
+			continue;
+		}
+
+		// skip disabled, ratified-only, or undefined extensions
+		if (supported != "vulkan") continue;
+		if (name.empty()) continue;
+		if (name.find("VK_VERSION_") == 0) continue;
+		if (name.find("_extension_") != string::npos) continue;
+
+		// skip vendor/platform-specific junk
+		if (name.starts_with("VK_ARM_")
+			|| name.starts_with("VK_MVK_")
+			|| name.starts_with("VK_QNX_")
+			|| name.starts_with("VK_QCOM_")
+			|| name.starts_with("VK_ANDROID_")
+			|| name.starts_with("VK_FUCHSIA_")
+			|| name.starts_with("VK_IOS_")
+			|| name.starts_with("VK_MACOS_")
+			|| name.starts_with("VK_GGP_")
+			|| name.starts_with("VK_NN_")
+			|| name.starts_with("VK_MESA_")
+			|| name.starts_with("VK_BRCM_")
+			|| name.starts_with("VK_SEC_")
+			|| name.starts_with("VK_VALVE_")
+			|| name.starts_with("VK_GOOGLE_")
+			|| name.starts_with("VK_INTEL_")
+			|| name.starts_with("VK_OHOS_")
+			|| name.starts_with("VK_HUAWEI_")
+			|| name.starts_with("VK_MTK_")
+			|| name.starts_with("VK_FB_")
+			|| name.starts_with("VK_COREAVI_")
+			|| name.starts_with("VK_MSFT_")
+			|| name.find("wayland") != string::npos
+			|| name.find("directfb") != string::npos
+			|| name.find("metal") != string::npos
+			|| name.find("drm") != string::npos)
+		{
+			continue;
 		}
 		
 		if (!name.empty()) validExtensions.push_back(name);
+		
+		PrintMessage(
+			MessageType::TYPE_SUCCESS, 
+			"Found result '" + name + "'!",
+			2);
 	}
 	
 	file.close();
