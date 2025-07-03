@@ -354,12 +354,11 @@ bool ParseLayers()
 {
 	vector<string> instanceLayers{};
 	
-	for (const auto& file : parser_out)
+	for (const auto& file : directory_iterator(parser_in))
 	{
 		path filePath = path(file);
 		
-		string extension = filePath.extension().string();
-		if (extension != ".json") continue;
+		if (filePath.extension() != ".json") continue;
 		
 		ifstream file(filePath);
 		if (!file.is_open())
@@ -371,51 +370,48 @@ bool ParseLayers()
 		}
 		
 		string line{};
+		string layerName{};
 		
 		while (getline(file, line))
 		{
-			if (line.find("<layer") == string::npos) continue;
-			
-			//extract attributes
-			auto ExtractAttribute = [](const string& line, const string& key) -> string
+			auto pos = line.find("\"name\"");
+			if (pos != string::npos)
 			{
-				string pattern = key + "=\"";
-				size_t start = line.find(pattern);
-				if (start == string::npos) return "";
-				
-				start += pattern.length();
-				size_t end = line.find('"', start);
-				if (end == string::npos) return "";
-				
-				return line.substr(start, end - start);
-			};
-			
-			const string name = ExtractAttribute(line, "name");
-			if (name.empty()) continue;
-			
-			if (name != "VK_LAYER_KHRONOS_validation" &&
-				!name.starts_with("VK_LAYER_LUNARG_"))
-			{
-				if (name.starts_with("VK_LAYER_RENDERDOC_")
-					|| name.starts_with("VK_LAYER_NV_")
-					|| name.starts_with("VK_LAYER_MESA_")
-					|| name.starts_with("VK_LAYER_INTEL_")
-					|| name.starts_with("VK_LAYER_GOOGLE_")
-					|| name.starts_with("VK_LAYER_OBSOLETE_"))
+				size_t start = line.find("\"", pos + 6);
+				size_t end = line.find("\"", start + 1);
+				if (start != string::npos
+					&& end != string::npos)
 				{
-					continue;
+					layerName = line.substr(start + 1, end - start - 1);
+					break;
 				}
 			}
-			
-			instanceLayers.push_back(name);
-			
-			PrintMessage(
-				MessageType::TYPE_SUCCESS, 
-				"Found instance layer '" + name + "'!",
-				2);
 		}
-		
 		file.close();
+		
+		if (layerName.empty()) continue;
+			
+		if (layerName != "VK_LAYER_KHRONOS_validation" 
+			&& !layerName.starts_with("VK_LAYER_KHRONOS_")
+			&& !layerName.starts_with("VK_LAYER_LUNARG_"))
+		{
+			if (layerName.starts_with("VK_LAYER_RENDERDOC_")
+				|| layerName.starts_with("VK_LAYER_NV_")
+				|| layerName.starts_with("VK_LAYER_MESA_")
+				|| layerName.starts_with("VK_LAYER_INTEL_")
+				|| layerName.starts_with("VK_LAYER_GOOGLE_")
+				|| layerName.starts_with("VK_LAYER_OBSOLETE_"))
+			{
+				continue;
+			}
+		}
+			
+		instanceLayers.push_back(layerName);
+			
+		PrintMessage(
+			MessageType::TYPE_SUCCESS, 
+			"Found instance layer '" + layerName + "'!",
+			2);
 	}
 	
 	size_t instanceLayersSize = instanceLayers.size();
@@ -423,7 +419,7 @@ bool ParseLayers()
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to find any vulkan 1.2 instance layers from file '" + filePath.string() + "'!");
+			"Failed to find any vulkan 1.2 instance layers!");
 		return false;
 	}
 		

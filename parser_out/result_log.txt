@@ -198,5 +198,14 @@ Starting to parse extensions...
 [SUCCESS] Found and saved '15' instance extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\vulkan_instance_extensions.txt'!
 [SUCCESS] Parsed all extensions!
 Starting to parse layers...
-[ERROR] Failed to find any vulkan 1.2 instance layers from file 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_in\vk.xml'!
-[ERROR] Failed to parse layers!
+  [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_api_dump'!
+  [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_crash_diagnostic'!
+  [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_gfxreconstruct'!
+  [SUCCESS] Found instance layer 'VK_LAYER_KHRONOS_profiles'!
+  [SUCCESS] Found instance layer 'VK_LAYER_KHRONOS_shader_object'!
+  [SUCCESS] Found instance layer 'VK_LAYER_KHRONOS_synchronization2'!
+  [SUCCESS] Found instance layer 'VK_LAYER_KHRONOS_validation'!
+  [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_monitor'!
+  [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_screenshot'!
+[SUCCESS] Found and saved '9' instance layers to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\vulkan_instance_layers.txt'!
+[SUCCESS] Parsed all layers!
