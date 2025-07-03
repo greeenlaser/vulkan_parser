@@ -32,7 +32,8 @@ static void PrintMessage(
 	const string& message,
 	int indentCount = 0);
 static bool CopyVK();
-static bool ParseVK();
+static bool ParseExtensions();
+static bool ParseLayers();
 
 int main ()
 {
@@ -58,19 +59,39 @@ int main ()
 	
 	PrintMessage(
 		MessageType::TYPE_MESSAGE, 
-		"Starting to parse VK file...");
+		"Starting to parse extensions...");
 	
-	if (ParseVK()) 
+	if (ParseExtensions()) 
 	{
 		PrintMessage(
 			MessageType::TYPE_SUCCESS,
-			"Parsed VK file!");
+			"Parsed all extensions!");
 	}
 	else 
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to parse VK file!");
+			"Failed to parse extensions!");
+			
+		cin.get();
+		return 0;
+	}
+	
+	PrintMessage(
+		MessageType::TYPE_MESSAGE, 
+		"Starting to parse layers...");
+	
+	if (ParseLayers()) 
+	{
+		PrintMessage(
+			MessageType::TYPE_SUCCESS,
+			"Parsed all layers!");
+	}
+	else 
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to parse layers!");
 			
 		cin.get();
 		return 0;
@@ -149,7 +170,7 @@ bool CopyVK()
 	return true;
 }
 
-bool ParseVK()
+bool ParseExtensions()
 {
 	path filePath = path(current_path() / "vk.xml");
 	if (!exists(filePath))
@@ -169,7 +190,8 @@ bool ParseVK()
 		return false;
 	}
 	
-	vector<string> validExtensions{};
+	vector<string> instanceExtensions{};
+	vector<string> deviceExtensions{};
 	string line{};
 	
 	while (getline(file, line))
@@ -187,15 +209,15 @@ bool ParseVK()
 			size_t end = line.find('"', start);
 			if (end == string::npos) return "";
 			
-			string result = line.substr(start, end - start);
-			return result;
+			return line.substr(start, end - start);
 		};
 		
 		const string name = ExtractAttribute(line, "name");
 		const string supported = ExtractAttribute(line, "supported");
 		const string promoted = ExtractAttribute(line, "promotedto");
+		const string type = ExtractAttribute(line, "type");
 		
-		// skip extensions promoted to Vulkan core
+		//skip extensions promoted to Vulkan core
 		if (promoted == "vulkan12"
 			|| promoted == "vulkan13"
 			|| promoted == "vulkan14")
@@ -203,13 +225,13 @@ bool ParseVK()
 			continue;
 		}
 
-		// skip disabled, ratified-only, or undefined extensions
+		//skip disabled, ratified-only, or undefined extensions
 		if (supported != "vulkan") continue;
 		if (name.empty()) continue;
 		if (name.find("VK_VERSION_") == 0) continue;
 		if (name.find("_extension_") != string::npos) continue;
 
-		// skip vendor- and OS-specific junk (non-Windows, non-X11)
+		//skip vendor- and OS-specific junk (non-Windows, non-X11)
 		if (name.starts_with("VK_AMD_")
 			|| name.starts_with("VK_NV_")
 			|| name.starts_with("VK_NVX_")
@@ -250,46 +272,193 @@ bool ParseVK()
 			continue;
 		}
 		
-		if (!name.empty()) validExtensions.push_back(name);
+		if (!name.empty())
+		{
+				if (type == "device") deviceExtensions.push_back(name);
+				else if (type == "instance") instanceExtensions.push_back(name);
+		}
 		
 		PrintMessage(
 			MessageType::TYPE_SUCCESS, 
-			"Found result '" + name + "'!",
+			"Found '" + type + "' extension '" + name + "'!",
 			2);
 	}
 	
 	file.close();
 	
-	size_t outputSize = validExtensions.size();
-	if (outputSize == 0)
+	size_t deviceExtSize = deviceExtensions.size();
+	size_t instanceExtSize = instanceExtensions.size();
+	if (deviceExtSize == 0)
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to find any opt-in vulkan 1.2 extensions from file '" + filePath.string() + "'!");
+			"Failed to find any opt-in vulkan 1.2 device extensions from file '" + filePath.string() + "'!");
+		return false;
+	}
+	if (instanceExtSize == 0)
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to find any opt-in vulkan 1.2 instance extensions from file '" + filePath.string() + "'!");
+		return false;
+	}
+	
+	//
+	// CREATE INSTANCE EXTENSIONS LIST
+	//
+	
+	//write output
+	path deviceOutputPath = path(current_path() / "vulkan_device_extensions.txt");
+	
+	ofstream deviceOut(deviceOutputPath);
+	if (!deviceOut.is_open())
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to open file '" + deviceOutputPath.string() + "' for editing!");
+		return false;
+	}
+	
+	for (const auto& ext : deviceExtensions)
+	{
+		deviceOut << ext << "\n";
+	}
+	deviceOut.close();
+	
+	PrintMessage(
+		MessageType::TYPE_SUCCESS, 
+		"Found and saved '" + to_string(deviceExtSize) + 
+		"' device extensions to '" + deviceOutputPath.string() + "'!");
+	
+	//
+	// CREATE DEVICE EXTENSIONS LIST
+	//
+	
+	//write output
+	path instanceOutputPath = path(current_path() / "vulkan_instance_extensions.txt");
+	
+	ofstream instanceOut(instanceOutputPath);
+	if (!instanceOut.is_open())
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to open file '" + instanceOutputPath.string() + "' for editing!");
+		return false;
+	}
+	
+	for (const auto& ext : instanceExtensions)
+	{
+		instanceOut << ext << "\n";
+	}
+	instanceOut.close();
+	
+	PrintMessage(
+		MessageType::TYPE_SUCCESS, 
+		"Found and saved '" + to_string(instanceExtSize) + 
+		"' instance extensions to '" + instanceOutputPath.string() + "'!");
+
+	return true;
+}
+
+bool ParseLayers()
+{
+	path filePath = path(current_path() / "vk.xml");
+	if (!exists(filePath))
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to find file '" + filePath.string() + "'!");
+		return false;
+	}
+	
+	ifstream file(filePath);
+	if (!file.is_open())
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to open file '" + filePath.string() + "' for reading!");
+		return false;
+	}
+	
+	vector<string> instanceLayers{};
+	string line{};
+	
+	while (getline(file, line))
+	{
+		if (line.find("<layer") == string::npos) continue;
+		
+		//extract attributes
+		auto ExtractAttribute = [](const string& line, const string& key) -> string
+		{
+			string pattern = key + "=\"";
+			size_t start = line.find(pattern);
+			if (start == string::npos) return "";
+			
+			start += pattern.length();
+			size_t end = line.find('"', start);
+			if (end == string::npos) return "";
+			
+			return line.substr(start, end - start);
+		};
+		
+		const string name = ExtractAttribute(line, "name");
+		if (name.empty()) continue;
+		
+		if (name != "VK_LAYER_KHRONOS_validation" &&
+			!name.starts_with("VK_LAYER_LUNARG_"))
+		{
+			if (name.starts_with("VK_LAYER_RENDERDOC_")
+				|| name.starts_with("VK_LAYER_NV_")
+				|| name.starts_with("VK_LAYER_MESA_")
+				|| name.starts_with("VK_LAYER_INTEL_")
+				|| name.starts_with("VK_LAYER_GOOGLE_")
+				|| name.starts_with("VK_LAYER_OBSOLETE_"))
+			{
+				continue;
+			}
+		}
+		
+		instanceLayers.push_back(name);
+		
+		PrintMessage(
+			MessageType::TYPE_SUCCESS, 
+			"Found instance layer '" + name + "'!",
+			2);
+	}
+	
+	file.close();
+	
+	size_t instanceLayersSize = instanceLayers.size();
+	if (instanceLayersSize == 0)
+	{
+		PrintMessage(
+			MessageType::TYPE_ERROR, 
+			"Failed to find any vulkan 1.2 instance layers from file '" + filePath.string() + "'!");
 		return false;
 	}
 	
 	//write output
-	path outputPath = path(current_path() / "vulkan_1_2_opt_in.txt");
+	path instanceLayerOutputPath = path(current_path() / "vulkan_instance_layers.txt");
 	
-	ofstream out(outputPath);
-	if (!out.is_open())
+	ofstream instanceLayerOut(instanceLayerOutputPath);
+	if (!instanceLayerOut.is_open())
 	{
 		PrintMessage(
 			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + outputPath.string() + "' for editing!");
+			"Failed to open file '" + instanceLayerOutputPath.string() + "' for editing!");
 		return false;
 	}
 	
-	for (const auto& ext : validExtensions)
+	for (const auto& ext : instanceLayers)
 	{
-		out << ext << "\n";
+		instanceLayerOut << ext << "\n";
 	}
-	out.close();
+	instanceLayerOut.close();
 	
 	PrintMessage(
 		MessageType::TYPE_SUCCESS, 
-		"Found and saved '" + to_string(validExtensions.size()) + 
-		"' opt-in extensions to '" + outputPath.string() + "'!");
+		"Found and saved '" + to_string(instanceLayersSize) + 
+		"' instance layers to '" + instanceLayerOutputPath.string() + "'!");
+
 	return true;
 }
