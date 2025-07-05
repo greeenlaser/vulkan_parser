@@ -221,41 +221,12 @@ bool ParseExtensions()
 		if (name.find("_extension_") != string::npos) continue;
 
 		//skip vendor- and OS-specific junk (non-Windows, non-X11)
-		if (name.starts_with("VK_AMD_")
-			|| name.starts_with("VK_AMDX_")
-			|| name.starts_with("VK_NV_")
-			|| name.starts_with("VK_NVX_")
-			|| name.starts_with("VK_INTEL_")
-			|| name.starts_with("VK_QCOM_")
-			|| name.starts_with("VK_ARM_")
-			|| name.starts_with("VK_IMG_")
-			|| name.starts_with("VK_HUAWEI_")
-			|| name.starts_with("VK_MSFT_")
-			|| name.starts_with("VK_FUCHSIA_")
-			|| name.starts_with("VK_VALVE_")
-			|| name.starts_with("VK_GOOGLE_")
-			|| name.starts_with("VK_LUNARG_")
-			|| name.starts_with("VK_SEC_")
-			|| name.starts_with("VK_ANDROID_")
-			|| name.starts_with("VK_NOKIA_")
-			|| name.starts_with("VK_BRCM_")
-			|| name.starts_with("VK_VIV_")
-			|| name.starts_with("VK_RENESAS_")
-			|| name.starts_with("VK_TI_")
-			|| name.starts_with("VK_MVK_")
-			|| name.starts_with("VK_QNX_")
-			|| name.starts_with("VK_IOS_")
-			|| name.starts_with("VK_MACOS_")
-			|| name.starts_with("VK_GGP_")
-			|| name.starts_with("VK_NN_")
-			|| name.starts_with("VK_MESA_")
-			|| name.starts_with("VK_MTK_")
-			|| name.starts_with("VK_FB_")
-			|| name.starts_with("VK_COREAVI_")
-			|| name.starts_with("VK_OHOS_")
+		if ((name.find("VK_KHR") == string::npos
+			&& name.find("VK_EXT") == string::npos)
 			|| name.find("wayland") != string::npos
-			|| name.find("directfb") != string::npos
 			|| name.find("metal") != string::npos
+			|| name.find("android") != string::npos
+			|| name.find("directfb") != string::npos
 			|| name.find("drm") != string::npos)
 		{
 			continue;
@@ -263,8 +234,8 @@ bool ParseExtensions()
 		
 		if (!name.empty())
 		{
-				if (type == "device") deviceExtensions.push_back(name);
-				else if (type == "instance") instanceExtensions.push_back(name);
+			if (type == "device") deviceExtensions.push_back(name);
+			else if (type == "instance") instanceExtensions.push_back(name);
 		}
 		
 		PrintMessage(
