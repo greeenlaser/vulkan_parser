@@ -206,39 +206,41 @@ bool ParseExtensions()
 		const string supported = ExtractAttribute(line, "supported");
 		const string promoted = ExtractAttribute(line, "promotedto");
 		const string type = ExtractAttribute(line, "type");
+
+		if (name.empty()) continue;
 		
 		//skip extensions promoted to Vulkan core
-		if (!promoted.empty() &&
-			(promoted == "VK_VERSION_1_1" 
-			|| promoted == "VK_VERSION_1_2") 
-			&& supported != "vulkan")
+		if (promoted == "VK_VERSION_1_1" 
+			|| promoted == "VK_VERSION_1_2")
 		{
 			continue;
 		}
 
 		//skip disabled, ratified-only, or undefined extensions
-		if (supported != "vulkan") continue;
-		if (name.empty()) continue;
+		if (supported == "disabled") continue;
 		if (name.find("VK_VERSION_") == 0) continue;
 		if (name.find("_extension_") != string::npos) continue;
 
-		//skip vendor- and OS-specific junk (non-Windows, non-X11)
-		if ((name.find("VK_KHR") == string::npos
-			&& name.find("VK_EXT") == string::npos)
-			|| name.find("wayland") != string::npos
+		bool isRequired =
+			name.find("VK_KHR") == 0
+			|| name.find("VK_EXT") == 0;
+
+		bool isBad =
+			name.find("wayland") != string::npos
 			|| name.find("metal") != string::npos
 			|| name.find("android") != string::npos
 			|| name.find("directfb") != string::npos
-			|| name.find("drm") != string::npos)
+			|| name.find("drm") != string::npos;
+
+		//skip vendor- and OS-specific junk (non-Windows, non-X11)
+		if (!isRequired
+			|| isBad)
 		{
 			continue;
 		}
 		
-		if (!name.empty())
-		{
-			if (type == "device") deviceExtensions.push_back(name);
-			else if (type == "instance") instanceExtensions.push_back(name);
-		}
+		if (type == "device") deviceExtensions.push_back(name);
+		else if (type == "instance") instanceExtensions.push_back(name);
 		
 		PrintMessage(
 			MessageType::TYPE_SUCCESS, 
