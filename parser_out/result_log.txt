@@ -4,13 +4,10 @@ Starting to parse extensions...
   [SUCCESS] Found 'instance' extension 'VK_KHR_display'!
   [SUCCESS] Found 'device' extension 'VK_KHR_display_swapchain'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_xlib_surface'!
-  [SUCCESS] Found 'instance' extension 'VK_KHR_xcb_surface'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_win32_surface'!
   [SUCCESS] Found 'instance' extension 'VK_EXT_debug_report'!
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_range_unrestricted'!
   [SUCCESS] Found 'device' extension 'VK_EXT_debug_marker'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_video_queue'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_video_decode_queue'!
   [SUCCESS] Found 'device' extension 'VK_EXT_transform_feedback'!
   [SUCCESS] Found 'device' extension 'VK_KHR_video_encode_h264'!
   [SUCCESS] Found 'device' extension 'VK_KHR_video_encode_h265'!
@@ -54,11 +51,9 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_sample_locations'!
   [SUCCESS] Found 'device' extension 'VK_EXT_blend_operation_advanced'!
   [SUCCESS] Found 'device' extension 'VK_KHR_acceleration_structure'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_ray_tracing_pipeline'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_ray_query'!
   [SUCCESS] Found 'device' extension 'VK_EXT_post_depth_coverage'!
+  [SUCCESS] Found 'device' extension 'VK_EXT_image_drm_format_modifier'!
   [SUCCESS] Found 'device' extension 'VK_EXT_validation_cache'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_portability_subset'!
   [SUCCESS] Found 'device' extension 'VK_EXT_filter_cubic'!
   [SUCCESS] Found 'device' extension 'VK_EXT_global_priority'!
   [SUCCESS] Found 'device' extension 'VK_EXT_external_memory_host'!
@@ -74,7 +69,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_fragment_density_map'!
   [SUCCESS] Found 'device' extension 'VK_EXT_subgroup_size_control'!
   [SUCCESS] Found 'device' extension 'VK_KHR_fragment_shading_rate'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_dynamic_rendering_local_read'!
   [SUCCESS] Found 'device' extension 'VK_EXT_shader_image_atomic_int64'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_quad_control'!
   [SUCCESS] Found 'device' extension 'VK_EXT_memory_budget'!
@@ -95,9 +89,7 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_extended_dynamic_state'!
   [SUCCESS] Found 'device' extension 'VK_KHR_deferred_host_operations'!
   [SUCCESS] Found 'device' extension 'VK_KHR_pipeline_executable_properties'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_host_image_copy'!
   [SUCCESS] Found 'device' extension 'VK_KHR_map_memory2'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_map_memory_placed'!
   [SUCCESS] Found 'device' extension 'VK_EXT_shader_atomic_float2'!
   [SUCCESS] Found 'instance' extension 'VK_EXT_surface_maintenance1'!
   [SUCCESS] Found 'device' extension 'VK_EXT_swapchain_maintenance1'!
@@ -106,6 +98,7 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_texel_buffer_alignment'!
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_bias_control'!
   [SUCCESS] Found 'device' extension 'VK_EXT_device_memory_report'!
+  [SUCCESS] Found 'instance' extension 'VK_EXT_acquire_drm_display'!
   [SUCCESS] Found 'device' extension 'VK_EXT_robustness2'!
   [SUCCESS] Found 'device' extension 'VK_EXT_custom_border_color'!
   [SUCCESS] Found 'device' extension 'VK_KHR_pipeline_library'!
@@ -113,15 +106,11 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_KHR_present_id'!
   [SUCCESS] Found 'device' extension 'VK_EXT_private_data'!
   [SUCCESS] Found 'device' extension 'VK_EXT_pipeline_creation_cache_control'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_video_encode_queue'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_object_refresh'!
   [SUCCESS] Found 'device' extension 'VK_KHR_synchronization2'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_descriptor_buffer'!
   [SUCCESS] Found 'device' extension 'VK_EXT_graphics_pipeline_library'!
   [SUCCESS] Found 'device' extension 'VK_KHR_fragment_shader_barycentric'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_subgroup_uniform_control_flow'!
   [SUCCESS] Found 'device' extension 'VK_KHR_zero_initialize_workgroup_memory'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_mesh_shader'!
   [SUCCESS] Found 'device' extension 'VK_EXT_ycbcr_2plane_444_formats'!
   [SUCCESS] Found 'device' extension 'VK_EXT_fragment_density_map2'!
   [SUCCESS] Found 'device' extension 'VK_EXT_image_robustness'!
@@ -133,6 +122,7 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_device_fault'!
   [SUCCESS] Found 'device' extension 'VK_EXT_rgba10x6_formats'!
   [SUCCESS] Found 'device' extension 'VK_EXT_vertex_input_dynamic_state'!
+  [SUCCESS] Found 'device' extension 'VK_EXT_physical_device_drm'!
   [SUCCESS] Found 'device' extension 'VK_EXT_device_address_binding_report'!
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_clip_control'!
   [SUCCESS] Found 'device' extension 'VK_EXT_primitive_topology_list_restart'!
@@ -150,8 +140,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_multi_draw'!
   [SUCCESS] Found 'device' extension 'VK_EXT_image_2d_view_of_3d'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_portability_enumeration'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_shader_tile_image'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_opacity_micromap'!
   [SUCCESS] Found 'device' extension 'VK_EXT_load_store_op_none'!
   [SUCCESS] Found 'device' extension 'VK_EXT_border_color_swizzle'!
   [SUCCESS] Found 'device' extension 'VK_EXT_pageable_device_local_memory'!
@@ -161,27 +149,21 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_clamp_zero_one'!
   [SUCCESS] Found 'device' extension 'VK_EXT_non_seamless_cube_map'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_maximal_reconvergence'!
-  [SUCCESS] Found 'instance' extension 'VK_EXT_application_parameters'!
   [SUCCESS] Found 'device' extension 'VK_EXT_image_compression_control_swapchain'!
   [SUCCESS] Found 'device' extension 'VK_EXT_nested_command_buffer'!
   [SUCCESS] Found 'device' extension 'VK_EXT_external_memory_acquire_unmodified'!
   [SUCCESS] Found 'device' extension 'VK_EXT_extended_dynamic_state3'!
   [SUCCESS] Found 'device' extension 'VK_EXT_subpass_merge_feedback'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_shader_module_identifier'!
   [SUCCESS] Found 'device' extension 'VK_EXT_rasterization_order_attachment_access'!
   [SUCCESS] Found 'device' extension 'VK_EXT_legacy_dithering'!
   [SUCCESS] Found 'device' extension 'VK_EXT_pipeline_protected_access'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_maintenance5'!
   [SUCCESS] Found 'device' extension 'VK_KHR_present_id2'!
   [SUCCESS] Found 'device' extension 'VK_KHR_present_wait2'!
   [SUCCESS] Found 'device' extension 'VK_KHR_ray_tracing_position_fetch'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_shader_object'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_pipeline_binary'!
   [SUCCESS] Found 'device' extension 'VK_EXT_mutable_descriptor_type'!
   [SUCCESS] Found 'device' extension 'VK_EXT_legacy_vertex_attributes'!
   [SUCCESS] Found 'instance' extension 'VK_EXT_layer_settings'!
   [SUCCESS] Found 'device' extension 'VK_EXT_pipeline_library_group_handles'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_dynamic_rendering_unused_attachments'!
   [SUCCESS] Found 'device' extension 'VK_KHR_cooperative_matrix'!
   [SUCCESS] Found 'device' extension 'VK_KHR_compute_shader_derivatives'!
   [SUCCESS] Found 'device' extension 'VK_KHR_video_decode_av1'!
@@ -198,12 +180,10 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_KHR_calibrated_timestamps'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_expect_assume'!
   [SUCCESS] Found 'device' extension 'VK_KHR_maintenance6'!
-  [SUCCESS] Found 'device' extension 'VK_KHR_video_encode_quantization_map'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_relaxed_extended_instruction'!
   [SUCCESS] Found 'device' extension 'VK_KHR_maintenance7'!
   [SUCCESS] Found 'device' extension 'VK_EXT_shader_replicated_composites'!
   [SUCCESS] Found 'device' extension 'VK_EXT_shader_float8'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_device_generated_commands'!
   [SUCCESS] Found 'device' extension 'VK_KHR_maintenance8'!
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_clamp_control'!
   [SUCCESS] Found 'device' extension 'VK_KHR_maintenance9'!
@@ -211,10 +191,9 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_KHR_depth_clamp_zero_one'!
   [SUCCESS] Found 'device' extension 'VK_EXT_vertex_attribute_robustness'!
   [SUCCESS] Found 'device' extension 'VK_KHR_robustness2'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_fragment_density_map_offset'!
   [SUCCESS] Found 'device' extension 'VK_EXT_zero_initialize_device_memory'!
-[SUCCESS] Found and saved '193' device extensions to 'C:\Users\greenlaser\Documents\_cpp\xml_parser\parser_out\vulkan_device_extensions.txt'!
-[SUCCESS] Found and saved '21' instance extensions to 'C:\Users\greenlaser\Documents\_cpp\xml_parser\parser_out\vulkan_instance_extensions.txt'!
+[SUCCESS] Found and saved '173' device extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\device_extensions.txt'!
+[SUCCESS] Found and saved '20' instance extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\instance_extensions.txt'!
 [SUCCESS] Parsed all extensions!
 Starting to parse layers...
   [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_api_dump'!
@@ -226,5 +205,5 @@ Starting to parse layers...
   [SUCCESS] Found instance layer 'VK_LAYER_KHRONOS_validation'!
   [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_monitor'!
   [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_screenshot'!
-[SUCCESS] Found and saved '9' instance layers to 'C:\Users\greenlaser\Documents\_cpp\xml_parser\parser_out\vulkan_instance_layers.txt'!
+[SUCCESS] Found and saved '9' instance layers to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\instance_layers.txt'!
 [SUCCESS] Parsed all layers!

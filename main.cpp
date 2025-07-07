@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <array>
 
 using std::cout;
 using std::cin;
@@ -20,6 +21,9 @@ using std::ofstream;
 using std::getline;
 using std::vector;
 using std::exception;
+using std::string_view;
+using std::array;
+using std::pair;
 
 enum class MessageType
 {
@@ -166,160 +170,295 @@ bool ParseExtensions()
 	if (!exists(filePath))
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
+			MessageType::TYPE_ERROR,
 			"Failed to find file '" + filePath.string() + "'!");
 		return false;
 	}
-	
+
 	ifstream file(filePath);
 	if (!file.is_open())
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
+			MessageType::TYPE_ERROR,
 			"Failed to open file '" + filePath.string() + "' for reading!");
 		return false;
 	}
-	
-	vector<string> instanceExtensions{};
-	vector<string> deviceExtensions{};
+
 	string line{};
-	
+
+	vector<string> deviceExtensions{};
+	vector<string> instanceExtensions{};
 	while (getline(file, line))
 	{
 		if (line.find("<extension") == string::npos) continue;
-		
+
+		/*
+		auto RemoveChar = [](string& str, char c)
+		{
+			str.erase(remove(str.begin(), str.end(), c), str.end());
+		};
+		auto RemoveStr = [](string& str, string_view sub)
+		{
+			if (sub.empty()) return;
+			
+			size_t pos = 0;
+			while ((pos = str.find(sub, pos)) != string::npos)
+			{
+				str.erase(pos, sub.size());
+			}
+		};
+		auto Trim = [](string& str)
+		{
+			const string ws = " \t\n\r\f\v";
+
+			//find first non-whitespace
+			auto start = str.find_first_not_of(ws);
+
+			//all whitespace or empty
+			if (start == string::npos)
+			{
+				str.clear();
+				return;
+			}
+
+			//find last non-whitespace
+			auto end = str.find_last_not_of(ws);
+
+			str.erase(end + 1);
+			str.erase(0, start);
+		};
+		auto RemoveTag = [](string& str, const string& tag)
+		{
+			const string key = tag + "=\"";
+			size_t pos = 0;
+			while ((pos = str.find(key, pos)) != string::npos)
+			{
+				size_t start = pos;
+				pos += key.size();
+
+				//find the closing '"'
+				size_t end = str.find('"', pos);
+				//no closing quote - erase from start to end of string
+				if (end == string::npos)
+				{
+					str.erase(start);
+					return;
+				}
+
+				//erase from the start of tag through the closing quote
+				str.erase(start, (end - start) + 1);
+
+				//continues onward to see if there are more
+			}
+		};
+		auto AddCommaAfterQuote = [](string& str)
+		{
+			bool isOpening = false;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (str[i] != '"') continue;
+
+				isOpening = !isOpening;
+				if (!isOpening
+					&& i + 1 < str.size())
+				{
+					str.insert(i + 1, ", ");
+					i += 2;
+				}
+			}
+		};
+		*/
+		auto SetVersion = [](string& str)
+		{
+			constexpr string_view tag = "depends";
+			const string key = string(tag) + "=\"";
+			auto start = str.find(key);
+			if (start == string::npos) return; //did not find tag
+
+			auto valueStart = start + key.size();
+			auto valueEnd = str.find('"', valueStart);
+			if (valueEnd == string::npos) return; //malformed
+
+			string_view value(&str[valueStart], valueEnd - valueStart);
+
+			constexpr array<pair<string_view, int>, 6> versions = 
+			{{
+				{"1_0", 0},
+				{"1_1", 1},
+				{"1_2", 2},
+				{"1_3", 3},
+				{"1_4", 4},
+				{"1_5", 5}
+			}};
+
+			int bestIndex = -1;
+			string_view bestStr = "1_0";
+
+			for (const auto& [ver, idx] : versions)
+			{
+				if (value.find(ver) != string::npos
+					&& idx > bestIndex)
+				{
+					bestIndex = idx;
+					bestStr = ver;
+				}
+			}
+
+			string replacement = string(tag) + "=\"" + string(bestStr) + "\"";
+
+			auto totalLength = (valueEnd - start) + 1;
+			str.replace(start, totalLength, replacement);
+		};
 		//extract attributes
 		auto ExtractAttribute = [](const string& line, const string& key) -> string
 		{
 			string pattern = key + "=\"";
 			size_t start = line.find(pattern);
 			if (start == string::npos) return "";
-			
+
 			start += pattern.length();
 			size_t end = line.find('"', start);
 			if (end == string::npos) return "";
-			
+
 			return line.substr(start, end - start);
 		};
-		
-		const string name = ExtractAttribute(line, "name");
-		const string supported = ExtractAttribute(line, "supported");
-		const string promoted = ExtractAttribute(line, "promotedto");
-		const string type = ExtractAttribute(line, "type");
 
-		if (name.empty()) continue;
-		
-		//skip extensions promoted to Vulkan core
-		if (promoted == "VK_VERSION_1_1" 
-			|| promoted == "VK_VERSION_1_2")
-		{
-			continue;
-		}
+		/*
+		Trim(line);
 
-		//skip disabled, ratified-only, or undefined extensions
-		if (supported == "disabled") continue;
-		if (name.find("VK_VERSION_") == 0) continue;
-		if (name.find("_extension_") != string::npos) continue;
+		RemoveChar(line, '<');
+		RemoveChar(line, '>');
+		RemoveChar(line, ' ');
+		RemoveStr(line, "extension");
 
-		bool isRequired =
-			name.find("VK_KHR") == 0
-			|| name.find("VK_EXT") == 0;
+		RemoveTag(line, "author");
+		RemoveTag(line, "contact");
+		RemoveTag(line, "number");
+		RemoveTag(line, "specialuse");
+		RemoveTag(line, "ratified");
+		*/
 
-		bool isBad =
-			name.find("wayland") != string::npos
-			|| name.find("metal") != string::npos
-			|| name.find("android") != string::npos
-			|| name.find("directfb") != string::npos
-			|| name.find("drm") != string::npos;
+		SetVersion(line);
 
-		//skip vendor- and OS-specific junk (non-Windows, non-X11)
-		if (!isRequired
-			|| isBad)
-		{
-			continue;
-		}
-		
+		//AddCommaAfterQuote(line);
+
+		bool isValid = (
+			line.find("supported=\"disabled") == string::npos
+			&& line.find("supported=\"deprecated") == string::npos
+			&& line.find("supported=\"vulkansc") == string::npos
+			&& line.find("promotedto=\"VK_VERSION_1_0") == string::npos
+			&& line.find("promotedto=\"VK_VERSION_1_1") == string::npos
+			&& line.find("promotedto=\"VK_VERSION_1_2") == string::npos
+			&& line.find("depends=\"1_3") == string::npos
+			&& line.find("depends=\"1_4") == string::npos
+			&& line.find("depends=\"1_5") == string::npos);
+
+		if (!isValid) continue;
+
+		bool isVendor = (
+			(line.find("name=\"VK_KHR_") == string::npos
+			&& line.find("name=\"VK_EXT_") == string::npos));
+
+		if (isVendor) continue;
+
+		bool isAllowedPlatform = (
+			line.find("platform=\"android") == string::npos
+			&& line.find("platform=\"directfb") == string::npos
+			&& line.find("platform=\"metal") == string::npos
+			&& line.find("platform=\"provisional") == string::npos
+			&& line.find("platform=\"wayland") == string::npos
+			&& line.find("platform=\"xcb") == string::npos);
+
+		if (!isAllowedPlatform) continue;
+
+		string name = ExtractAttribute(line, "name");
+		string type = ExtractAttribute(line, "type");
+
 		if (type == "device") deviceExtensions.push_back(name);
 		else if (type == "instance") instanceExtensions.push_back(name);
-		
+
 		PrintMessage(
-			MessageType::TYPE_SUCCESS, 
+			MessageType::TYPE_SUCCESS,
 			"Found '" + type + "' extension '" + name + "'!",
 			2);
 	}
-	
+
 	file.close();
-	
+
 	size_t deviceExtSize = deviceExtensions.size();
-	size_t instanceExtSize = instanceExtensions.size();
 	if (deviceExtSize == 0)
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to find any opt-in vulkan 1.2 device extensions from file '" + filePath.string() + "'!");
+			MessageType::TYPE_ERROR,
+			"Failed to find any device extensions from file '" + filePath.string() + "'!");
 		return false;
 	}
+
+	size_t instanceExtSize = instanceExtensions.size();
 	if (instanceExtSize == 0)
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to find any opt-in vulkan 1.2 instance extensions from file '" + filePath.string() + "'!");
+			MessageType::TYPE_ERROR,
+			"Failed to find any instance extensions from file '" + filePath.string() + "'!");
 		return false;
 	}
-	
+
+	sort(deviceExtensions.begin(), deviceExtensions.end());
+	sort(instanceExtensions.begin(), instanceExtensions.end());
+
 	//
-	// CREATE INSTANCE EXTENSIONS LIST
+	// SAVE DEVICE EXTENSIONS
 	//
-	
+
 	//write output
-	path deviceOutputPath = path(parser_out / "vulkan_device_extensions.txt");
-	
-	ofstream deviceOut(deviceOutputPath);
-	if (!deviceOut.is_open())
+	path deviceExtensionsPath = path(parser_out / "device_extensions.txt");
+
+	ofstream outDev(deviceExtensionsPath);
+	if (!outDev.is_open())
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + deviceOutputPath.string() + "' for writing!");
+			MessageType::TYPE_ERROR,
+			"Failed to open file '" + deviceExtensionsPath.string() + "' for writing!");
 		return false;
 	}
-	
+
 	for (const auto& ext : deviceExtensions)
 	{
-		deviceOut << ext << "\n";
+		outDev << ext << "\n";
 	}
-	deviceOut.close();
-	
+	outDev.close();
+
 	PrintMessage(
-		MessageType::TYPE_SUCCESS, 
-		"Found and saved '" + to_string(deviceExtSize) + 
-		"' device extensions to '" + deviceOutputPath.string() + "'!");
-	
+		MessageType::TYPE_SUCCESS,
+		"Found and saved '" + to_string(deviceExtSize) +
+		"' device extensions to '" + deviceExtensionsPath.string() + "'!");
+
 	//
-	// CREATE DEVICE EXTENSIONS LIST
+	// SAVE INSTANCE EXTENSIONS
 	//
-	
+
 	//write output
-	path instanceOutputPath = path(parser_out / "vulkan_instance_extensions.txt");
-	
-	ofstream instanceOut(instanceOutputPath);
-	if (!instanceOut.is_open())
+	path instanceExtensionsPath = path(parser_out / "instance_extensions.txt");
+
+	ofstream outIns(instanceExtensionsPath);
+	if (!outIns.is_open())
 	{
 		PrintMessage(
-			MessageType::TYPE_ERROR, 
-			"Failed to open file '" + instanceOutputPath.string() + "' for writing!");
+			MessageType::TYPE_ERROR,
+			"Failed to open file '" + instanceExtensionsPath.string() + "' for writing!");
 		return false;
 	}
-	
+
 	for (const auto& ext : instanceExtensions)
 	{
-		instanceOut << ext << "\n";
+		outIns << ext << "\n";
 	}
-	instanceOut.close();
-	
+	outIns.close();
+
 	PrintMessage(
-		MessageType::TYPE_SUCCESS, 
-		"Found and saved '" + to_string(instanceExtSize) + 
-		"' instance extensions to '" + instanceOutputPath.string() + "'!");
+		MessageType::TYPE_SUCCESS,
+		"Found and saved '" + to_string(instanceExtSize) +
+		"' instance extensions to '" + instanceExtensionsPath.string() + "'!");
 
 	return true;
 }
@@ -398,7 +537,7 @@ bool ParseLayers()
 	}
 		
 	//write output
-	path instanceLayerOutputPath = path(parser_out / "vulkan_instance_layers.txt");
+	path instanceLayerOutputPath = path(parser_out / "instance_layers.txt");
 		
 	ofstream instanceLayerOut(instanceLayerOutputPath);
 	if (!instanceLayerOut.is_open())
