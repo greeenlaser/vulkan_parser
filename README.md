@@ -5,6 +5,7 @@ The purpose of this repository is to distribute the source files that are used t
 The official Vulkan API to build or run the executable that creates the filtered files in *parse-out* is not required because all required files are already placed inside *parse-in*.
 
 > The copy of the [official vk.xml file](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) has been placed to the *parse-in* folder.
+
 > The copies of the json files used for layers have been placed to the *parse-in* folder, each layer has its own json file.
 
 ---
