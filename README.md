@@ -23,7 +23,7 @@ Run *build_all_windows.bat* to compile from source code.
 
 # Running the executable
 
-Once the executable has been compiled simply run it in *out/Release/KalaTool.exe* or *out/Release/KalaTool.exe* and press Enter to close the executable once it has finished.
+Once the executable has been compiled simply run it in *out/build/debug/KalaTool.exe* or *out/build/release/KalaTool.exe* and press Enter to close the executable once it has finished.
 
 ---
 
