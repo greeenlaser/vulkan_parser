@@ -2,7 +2,7 @@
 
 The purpose of this repository is to distribute the source files that are used to choose which Vulkan 1.2-compatible opt-in-only extensions should be allowed in [KalaWindow Vulkan binary](https://github.com/KalaKit/KalaWindow).
 
-The official Vulkan API to build or run the executable that creates the filtered files in *parser_out* is not required because all required files are already placed inside *parser_in*.
+The official Vulkan API is not required to build or run the executable that creates the filtered files in *parser_out* because all required files are already placed inside *parser_in*.
 
 > The copy of the [official vk.xml file](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) has been placed to the *parser_in* folder.
 
