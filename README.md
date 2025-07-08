@@ -7,6 +7,8 @@ The official Vulkan API to build or run the executable that creates the filtered
 > The copy of the [official vk.xml file](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) has been placed to the *parse-in* folder.
 > The copies of the json files used for layers have been placed to the *parse-in* folder, each layer has its own json file.
 
+---
+
 # Compilation
 
 The executable that creates the filters has these requirements:
@@ -16,9 +18,13 @@ The executable that creates the filters has these requirements:
 
 Run *build_all_windows.bat* to compile from source code.
 
+---
+
 # Running the executable
 
 Once the executable has been compiled simply run it in *out/Release/KalaTool.exe* or *out/Release/KalaTool.exe* and press Enter to close the executable once it has finished.
+
+---
 
 # Filtering extensions
 
