@@ -14,7 +14,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_sampler_filter_minmax'!
   [SUCCESS] Found 'device' extension 'VK_KHR_descriptor_update_template'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_win32_surface'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_image_drm_format_modifier'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_xlib_surface'!
   [SUCCESS] Found 'instance' extension 'VK_EXT_debug_report'!
   [SUCCESS] Found 'device' extension 'VK_EXT_depth_bias_control'!
@@ -28,7 +27,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_astc_decode_mode'!
   [SUCCESS] Found 'device' extension 'VK_KHR_multiview'!
   [SUCCESS] Found 'device' extension 'VK_EXT_rasterization_order_attachment_access'!
-  [SUCCESS] Found 'instance' extension 'VK_EXT_acquire_drm_display'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_get_physical_device_properties2'!
   [SUCCESS] Found 'device' extension 'VK_KHR_device_group'!
   [SUCCESS] Found 'instance' extension 'VK_KHR_get_surface_capabilities2'!
@@ -79,7 +77,6 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_EXT_queue_family_foreign'!
   [SUCCESS] Found 'device' extension 'VK_KHR_dedicated_allocation'!
   [SUCCESS] Found 'device' extension 'VK_KHR_storage_buffer_storage_class'!
-  [SUCCESS] Found 'device' extension 'VK_EXT_physical_device_drm'!
   [SUCCESS] Found 'instance' extension 'VK_EXT_debug_utils'!
   [SUCCESS] Found 'device' extension 'VK_EXT_shader_stencil_export'!
   [SUCCESS] Found 'device' extension 'VK_KHR_shader_bfloat16'!
@@ -195,8 +192,8 @@ Starting to parse extensions...
   [SUCCESS] Found 'device' extension 'VK_KHR_maintenance9'!
   [SUCCESS] Found 'device' extension 'VK_KHR_depth_clamp_zero_one'!
   [SUCCESS] Found 'device' extension 'VK_EXT_zero_initialize_device_memory'!
-[SUCCESS] Found and saved '162' device extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\device_extensions.txt'!
-[SUCCESS] Found and saved '25' instance extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\instance_extensions.txt'!
+[SUCCESS] Found and saved '160' device extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\device_extensions.txt'!
+[SUCCESS] Found and saved '24' instance extensions to 'C:\Users\Laser\Desktop\test 1\github\xml_parser\parser_out\instance_extensions.txt'!
 [SUCCESS] Parsed all extensions!
 Starting to parse layers...
   [SUCCESS] Found instance layer 'VK_LAYER_LUNARG_api_dump'!

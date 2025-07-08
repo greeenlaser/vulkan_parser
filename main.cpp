@@ -350,7 +350,8 @@ bool ParseExtensions()
 			&& line.find("platform=\"metal") == string::npos
 			&& line.find("platform=\"provisional") == string::npos
 			&& line.find("platform=\"wayland") == string::npos
-			&& line.find("platform=\"xcb") == string::npos);
+			&& line.find("platform=\"xcb") == string::npos
+			&& line.find("_drm") == string::npos);
 
 		if (!isAllowedPlatform) continue;
 
