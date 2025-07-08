@@ -37,3 +37,9 @@ The filtering system for extensions is split into two passes.
 ## Extension post-pass filter
 
 ...
+
+---
+
+# Filtering layers
+
+...
