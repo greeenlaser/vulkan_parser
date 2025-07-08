@@ -273,49 +273,6 @@ bool ParseExtensions()
 				}
 			}
 		};
-	/*
-	auto SetVersion = [](string& str)
-	{
-		constexpr string_view tag = "depends";
-		const string key = string(tag) + "=\"";
-		auto start = str.find(key);
-		if (start == string::npos) return; //did not find tag
-
-		auto valueStart = start + key.size();
-		auto valueEnd = str.find('"', valueStart);
-		if (valueEnd == string::npos) return; //malformed
-
-		string_view value(&str[valueStart], valueEnd - valueStart);
-
-		constexpr array<pair<string_view, int>, 6> versions =
-		{{
-			{"VK_VERSION_1_0", 0},
-			{"VK_VERSION_1_1", 1},
-			{"VK_VERSION_1_2", 2},
-			{"VK_VERSION_1_3", 3},
-			{"VK_VERSION_1_4", 4},
-			{"VK_VERSION_1_5", 5}
-		}};
-
-		int bestIndex = -1;
-		string_view bestStr = "VK_VERSION_1_0";
-
-		for (const auto& [ver, idx] : versions)
-		{
-			if (value.find(ver) != string::npos
-				&& idx > bestIndex)
-			{
-				bestIndex = idx;
-				bestStr = ver;
-			}
-		}
-
-		string replacement = string(tag) + "=\"" + string(bestStr) + "\"";
-
-		auto totalLength = (valueEnd - start) + 1;
-		str.replace(start, totalLength, replacement);
-	};
-	*/
 	auto ParseDepends = [](string& str) -> vector<string>
 		{
 			vector<string> result{};
@@ -421,7 +378,6 @@ bool ParseExtensions()
 		RemoveChar(line, '(');
 		RemoveChar(line, ')');
 
-		//SetVersion(line);
 		vector<string> dependsData = ParseDepends(line);
 
 		cleanedLines[line] = dependsData;
@@ -457,8 +413,29 @@ bool ParseExtensions()
 		string name = ExtractAttribute(key, "name");
 		string type = ExtractAttribute(key, "type");
 
+		int maxMinor = -1;
+		vector<string> extDeps{};
+		for (auto const& dep : deps)
+		{
+			if (dep.rfind("VK_VERSION_1_", 0) == 0)
+			{
+				int minor = stoi(dep.substr(strlen("VK_VERSION_1_")));
+				maxMinor = max(maxMinor, minor);
+			}
+			else extDeps.push_back(dep);
+		}
+
+		if (maxMinor >= 3)
+		{
+			PrintMessage(
+				MessageType::TYPE_MESSAGE,
+				"Skipped extension '" + name + "' because version is '" + to_string(maxMinor) + "'!",
+				4);
+			continue;
+		}
+
 		bool isValid = true;
-		for (auto const& e : deps)
+		for (auto const& e : extDeps)
 		{
 			if (!validExtensionKeys.count(e))
 			{
