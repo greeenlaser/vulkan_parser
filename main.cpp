@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 #include <array>
+#include <unordered_map>
+#include <unordered_set>
 
 using std::cout;
 using std::cin;
@@ -24,6 +26,9 @@ using std::exception;
 using std::string_view;
 using std::array;
 using std::pair;
+using std::unordered_map;
+using std::unordered_set;
+using std::max;
 
 enum class MessageType
 {
@@ -186,28 +191,29 @@ bool ParseExtensions()
 
 	string line{};
 
-	vector<string> deviceExtensions{};
-	vector<string> instanceExtensions{};
-	while (getline(file, line))
-	{
-		if (line.find("<extension") == string::npos) continue;
+	unordered_map<string, vector<string>> cleanedLines{};
 
-		/*
-		auto RemoveChar = [](string& str, char c)
+	auto RemoveChar = [](string& str, char c)
 		{
 			str.erase(remove(str.begin(), str.end(), c), str.end());
 		};
-		auto RemoveStr = [](string& str, string_view sub)
+	auto RemoveStr = [](string& str, string_view sub)
 		{
 			if (sub.empty()) return;
-			
+
 			size_t pos = 0;
 			while ((pos = str.find(sub, pos)) != string::npos)
 			{
 				str.erase(pos, sub.size());
 			}
 		};
-		auto Trim = [](string& str)
+	auto ReplaceChar = [](const string& str, char original, char target)
+		{
+			string out = str;
+			replace(out.begin(), out.end(), original, target);
+			return out;
+		};
+	auto Trim = [](string& str)
 		{
 			const string ws = " \t\n\r\f\v";
 
@@ -227,7 +233,7 @@ bool ParseExtensions()
 			str.erase(end + 1);
 			str.erase(0, start);
 		};
-		auto RemoveTag = [](string& str, const string& tag)
+	auto RemoveTag = [](string& str, const string& tag)
 		{
 			const string key = tag + "=\"";
 			size_t pos = 0;
@@ -251,7 +257,7 @@ bool ParseExtensions()
 				//continues onward to see if there are more
 			}
 		};
-		auto AddCommaAfterQuote = [](string& str)
+	auto AddCommaAfterQuote = [](string& str)
 		{
 			bool isOpening = false;
 			for (size_t i = 0; i < str.size(); ++i)
@@ -267,93 +273,113 @@ bool ParseExtensions()
 				}
 			}
 		};
-		*/
-		auto SetVersion = [](string& str)
+	/*
+	auto SetVersion = [](string& str)
+	{
+		constexpr string_view tag = "depends";
+		const string key = string(tag) + "=\"";
+		auto start = str.find(key);
+		if (start == string::npos) return; //did not find tag
+
+		auto valueStart = start + key.size();
+		auto valueEnd = str.find('"', valueStart);
+		if (valueEnd == string::npos) return; //malformed
+
+		string_view value(&str[valueStart], valueEnd - valueStart);
+
+		constexpr array<pair<string_view, int>, 6> versions =
+		{{
+			{"VK_VERSION_1_0", 0},
+			{"VK_VERSION_1_1", 1},
+			{"VK_VERSION_1_2", 2},
+			{"VK_VERSION_1_3", 3},
+			{"VK_VERSION_1_4", 4},
+			{"VK_VERSION_1_5", 5}
+		}};
+
+		int bestIndex = -1;
+		string_view bestStr = "VK_VERSION_1_0";
+
+		for (const auto& [ver, idx] : versions)
 		{
-			constexpr string_view tag = "depends";
-			const string key = string(tag) + "=\"";
-			auto start = str.find(key);
-			if (start == string::npos) return; //did not find tag
-
-			auto valueStart = start + key.size();
-			auto valueEnd = str.find('"', valueStart);
-			if (valueEnd == string::npos) return; //malformed
-
-			string_view value(&str[valueStart], valueEnd - valueStart);
-
-			constexpr array<pair<string_view, int>, 6> versions = 
-			{{
-				{"1_0", 0},
-				{"1_1", 1},
-				{"1_2", 2},
-				{"1_3", 3},
-				{"1_4", 4},
-				{"1_5", 5}
-			}};
-
-			int bestIndex = -1;
-			string_view bestStr = "1_0";
-
-			for (const auto& [ver, idx] : versions)
+			if (value.find(ver) != string::npos
+				&& idx > bestIndex)
 			{
-				if (value.find(ver) != string::npos
-					&& idx > bestIndex)
+				bestIndex = idx;
+				bestStr = ver;
+			}
+		}
+
+		string replacement = string(tag) + "=\"" + string(bestStr) + "\"";
+
+		auto totalLength = (valueEnd - start) + 1;
+		str.replace(start, totalLength, replacement);
+	};
+	*/
+	auto ParseDepends = [](string& str) -> vector<string>
+		{
+			vector<string> result{};
+			const string key = "depends=\"";
+			auto pos = str.find(key);
+			if (pos == string::npos) return result; //no depends=
+
+			auto valueStart = pos + key.size();
+			auto valueEnd = str.find('"', valueStart);
+			if (valueEnd == string::npos) return result; //malformed
+
+			string content = str.substr(valueStart, valueEnd - valueStart);
+
+			size_t start = 0;
+			while (start <= content.size())
+			{
+				auto comma = content.find(',', start);
+				string token{};
+				if (comma == string::npos)
 				{
-					bestIndex = idx;
-					bestStr = ver;
+					token = content.substr(start);
+					if (!token.empty()) result.push_back(token);
+					break;
+				}
+				else
+				{
+					token = content.substr(start, comma - start);
+					if (!token.empty()) result.push_back(token);
+					start = comma + 1;
 				}
 			}
 
-			string replacement = string(tag) + "=\"" + string(bestStr) + "\"";
-
-			auto totalLength = (valueEnd - start) + 1;
-			str.replace(start, totalLength, replacement);
-		};
-		//extract attributes
-		auto ExtractAttribute = [](const string& line, const string& key) -> string
-		{
-			string pattern = key + "=\"";
-			size_t start = line.find(pattern);
-			if (start == string::npos) return "";
-
-			start += pattern.length();
-			size_t end = line.find('"', start);
-			if (end == string::npos) return "";
-
-			return line.substr(start, end - start);
+			return result;
 		};
 
-		/*
-		Trim(line);
+	while (getline(file, line))
+	{
+		if (line.find("<extension") == string::npos) continue;
 
-		RemoveChar(line, '<');
-		RemoveChar(line, '>');
-		RemoveChar(line, ' ');
-		RemoveStr(line, "extension");
+		//
+		// FILTER BAD RESULTS
+		//
 
-		RemoveTag(line, "author");
-		RemoveTag(line, "contact");
-		RemoveTag(line, "number");
-		RemoveTag(line, "specialuse");
-		RemoveTag(line, "ratified");
-		*/
-
-		SetVersion(line);
-
-		//AddCommaAfterQuote(line);
-
-		bool isValid = (
+		bool isSupported = (
 			line.find("supported=\"disabled") == string::npos
 			&& line.find("supported=\"deprecated") == string::npos
-			&& line.find("supported=\"vulkansc") == string::npos
-			&& line.find("promotedto=\"VK_VERSION_1_0") == string::npos
-			&& line.find("promotedto=\"VK_VERSION_1_1") == string::npos
-			&& line.find("promotedto=\"VK_VERSION_1_2") == string::npos
-			&& line.find("depends=\"1_3") == string::npos
-			&& line.find("depends=\"1_4") == string::npos
-			&& line.find("depends=\"1_5") == string::npos);
+			&& line.find("supported=\"vulkansc") == string::npos);
 
-		if (!isValid) continue;
+		if (!isSupported) continue;
+
+		bool isPromotedToCorrectVersion = (
+			line.find("promotedto=\"VK_VERSION_1_0") != string::npos
+			|| line.find("promotedto=\"VK_VERSION_1_1") != string::npos
+			|| line.find("promotedto=\"VK_VERSION_1_2") != string::npos
+			|| line.find("promotedto") == string::npos);
+
+		if (!isPromotedToCorrectVersion) continue;
+
+		bool isCorrectVersion = (
+			line.find("VK_VERSION_1_3") == string::npos
+			&& line.find("VK_VERSION_1_4") == string::npos
+			&& line.find("VK_VERSION_1_5") == string::npos);
+
+		if (!isCorrectVersion) continue;
 
 		bool isVendor = (
 			(line.find("name=\"VK_KHR_") == string::npos
@@ -371,8 +397,81 @@ bool ParseExtensions()
 
 		if (!isAllowedPlatform) continue;
 
-		string name = ExtractAttribute(line, "name");
-		string type = ExtractAttribute(line, "type");
+		//
+		// CLEAN UP GOOD RESULTS
+		//
+
+		Trim(line);
+
+		RemoveChar(line, '<');
+		RemoveChar(line, '>');
+		RemoveChar(line, ' ');
+		RemoveStr(line, "extension");
+
+		RemoveTag(line, "author");
+		RemoveTag(line, "contact");
+		RemoveTag(line, "number");
+		RemoveTag(line, "specialuse");
+		RemoveTag(line, "ratified");
+		RemoveTag(line, "comment");
+
+		AddCommaAfterQuote(line);
+
+		line = ReplaceChar(line, '+', ',');
+		RemoveChar(line, '(');
+		RemoveChar(line, ')');
+
+		//SetVersion(line);
+		vector<string> dependsData = ParseDepends(line);
+
+		cleanedLines[line] = dependsData;
+	}
+
+	file.close();
+
+	vector<string> deviceExtensions{};
+	vector<string> instanceExtensions{};
+
+	auto ExtractAttribute = [](const string& line, const string& key) -> string
+		{
+			string pattern = key + "=\"";
+			size_t start = line.find(pattern);
+			if (start == string::npos) return "";
+
+			start += pattern.length();
+			size_t end = line.find('"', start);
+			if (end == string::npos) return "";
+
+			return line.substr(start, end - start);
+		};
+
+	unordered_set<string> validExtensionKeys{};
+	for (const auto& [k, _] : cleanedLines)
+	{
+		string name = ExtractAttribute(k, "name");
+		validExtensionKeys.insert(name);
+	}
+
+	for (const auto& [key, deps] : cleanedLines)
+	{
+		string name = ExtractAttribute(key, "name");
+		string type = ExtractAttribute(key, "type");
+
+		bool isValid = true;
+		for (auto const& e : deps)
+		{
+			if (!validExtensionKeys.count(e))
+			{
+				isValid = false;
+				PrintMessage(
+					MessageType::TYPE_MESSAGE,
+					"Skipped extension '" + name + "' because Vulkan 1.2 does not have extension '" + e + "'!",
+					4);
+				break;
+			}
+		}
+
+		if (!isValid) continue;
 
 		if (type == "device") deviceExtensions.push_back(name);
 		else if (type == "instance") instanceExtensions.push_back(name);
@@ -382,8 +481,6 @@ bool ParseExtensions()
 			"Found '" + type + "' extension '" + name + "'!",
 			2);
 	}
-
-	file.close();
 
 	size_t deviceExtSize = deviceExtensions.size();
 	if (deviceExtSize == 0)
